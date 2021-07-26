@@ -27,8 +27,8 @@ class UserRepositoryTest {
 
     @Test
     public void TestCreateUserWithOneRole() {
-        User namMHUser = new User("dudu@gmail.com", "dudu123", "Dudu", "Tutu");
-        Optional<Role> assistantRole = roleRepository.findById(5);
+        User namMHUser = new User("gloire@gmail.com", "glo123", "Glory", "Beya");
+        Optional<Role> assistantRole = roleRepository.findById(1);
         if (assistantRole.isPresent()) namMHUser.addRole(assistantRole.get());
 
         User savedUser = userRepository.save(namMHUser);
@@ -37,9 +37,9 @@ class UserRepositoryTest {
 
     @Test
     public void TestCreateUserWithTwoRoles() {
-        User gloryUser = new User("glory@gmail.com", "glo123", "Gloire", "Beya");
-        Optional<Role> adminRole = roleRepository.findById(1);
-        Optional<Role> editorRole = roleRepository.findById(2);
+        User gloryUser = new User("sony@gmail.com", "sony123", "Sony", "Tshinguli");
+        Optional<Role> adminRole = roleRepository.findById(2);
+        Optional<Role> editorRole = roleRepository.findById(3);
 
         if (adminRole.isPresent()) gloryUser.addRole(adminRole.get());
         if (editorRole.isPresent()) gloryUser.addRole(editorRole.get());
@@ -68,7 +68,7 @@ class UserRepositoryTest {
     }
     @Test
     public void updateUserById(){
-        Optional<User> optionalUser = userRepository.findById(2);
+        Optional<User> optionalUser = userRepository.findById(1);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             user.setEmail("gloirebeyait@gmail.com");
@@ -83,12 +83,12 @@ class UserRepositoryTest {
 
         if(optionalUser.isPresent()){
             User user = optionalUser.get();
-            user.getRoleSet().remove(new Role(1));
+            user.getRoleSet().remove(new Role(2));
             user.addRole(new Role(3), new Role(4));
 
             User savedUser = userRepository.save(user);
 
-            assertThat(savedUser.getRoleSet().size()).isEqualTo(3);
+            assertThat(savedUser.getRoleSet().size()).isEqualTo(2);
         }
     }
 

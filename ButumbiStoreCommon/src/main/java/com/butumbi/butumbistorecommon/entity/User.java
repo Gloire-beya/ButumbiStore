@@ -25,8 +25,8 @@ public class User {
 
     @Column(length = 64)
     private String photos;
-    @Column(length = 64)
-    private boolean enable;
+
+    private boolean enabled;
 
     @ManyToMany
     @JoinTable(
@@ -46,14 +46,14 @@ public class User {
         this.lastName = lastName;
     }
 
-    public User(Integer id, String email, String password, String firstName, String lastName, String photos, boolean enable, Set<Role> roleSet) {
+    public User(Integer id, String email, String password, String firstName, String lastName, String photos, boolean enabled, Set<Role> roleSet) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
         this.photos = photos;
-        this.enable = enable;
+        this.enabled = enabled;
         this.roleSet = roleSet;
     }
 
@@ -105,12 +105,12 @@ public class User {
         this.photos = photos;
     }
 
-    public boolean isEnable() {
-        return enable;
+    public boolean isEnabled() {
+        return enabled;
     }
 
-    public void setEnable(boolean enable) {
-        this.enable = enable;
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     public Set<Role> getRoleSet() {
@@ -125,5 +125,19 @@ public class User {
         for (Role role : roles) {
             this.roleSet.add(role);
         }
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", photos='" + photos + '\'' +
+                ", enabled=" + enabled +
+                ", roleSet=" + roleSet +
+                '}';
     }
 }

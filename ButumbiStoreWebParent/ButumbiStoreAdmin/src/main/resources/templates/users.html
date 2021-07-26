@@ -9,7 +9,7 @@
     <script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
     <script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
 
-    <title>Butumbi Shop - Admin </title>
+    <title>List users </title>
 </head>
 <body>
 <div class="container-fluid">
@@ -61,9 +61,42 @@
         </nav>
     </div>
     <div>
-        <h1>Butumbi Control Panel</h1>
+        <h2>Manage users</h2>
+        <a th:href="@{/users/new}">Create new User</a>
+    </div>
+
+    <div th:if="${message != null}" class="alert alert-success text-center">
+        [[${message}]]
     </div>
     <div>
+        <table class="table table-bordered table-hover table-striped table-responsive-lg">
+            <thead class="thead-dark">
+                <tr>
+                    <th>User ID</th>
+                    <th>Photos</th>
+                    <th>Email</th>
+                    <th>First name</th>
+                    <th>Last name</th>
+                    <th>Roles</th>
+                    <th>Enabled</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="user : ${userList}">
+                    <td>[[${user.id}]]</td>
+                    <td></td>
+                    <td>[[${user.email}]]</td>
+                    <td>[[${user.firstName}]]</td>
+                    <td>[[${user.lastName}]]</td>
+                    <td>[[${user.roleSet}]]</td>
+                    <td>[[${user.enabled}]]</td>
+                    <td>Edit &nbsp; Delete</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="text-center">
         <p>Butumbi Control Panel - Copyright &copy; Butumbi</p>
     </div>
 </div>
