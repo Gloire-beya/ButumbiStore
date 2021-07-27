@@ -18,13 +18,13 @@ ButumbiStore is ecommerce platform allowing customers to buy online.
 * Customer
 
 
-### Front end > Usecases for visitos
+### Front end > Use cases for visitos
 A visitor can do the follow:
 * View products
 * View articles
 * Sign up (to become a customer)
 
-### Front end > Usecases for customers
+### Front end > Use cases for customers
 A customer can do the following
 * View prders
 * Manage shopping cart
@@ -76,11 +76,11 @@ A Admin can do the follow
 
 ## Technical requirements
 
-### Accessibility
-### Availability
-### Security
-### Performance
-### Scalability
+* Accessibility
+* Availability
+* Security
+* Performance
+* Scalability
 
 
-## Note : This Application is still under development. We are uploading code progressively as we are moving forward. for more details about the project, you can shoot me an email and I will be glad to have a chat with you. Thank you
+#### Note : This Application is still under development. We are uploading code progressively as we are moving forward. for more details about the project, you can shoot me an email and I will be glad to have a chat with you. Thank you
