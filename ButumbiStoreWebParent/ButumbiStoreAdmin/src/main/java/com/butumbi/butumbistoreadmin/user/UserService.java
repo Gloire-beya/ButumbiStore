@@ -7,13 +7,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
 
-    private UserRepository userRepository;
-    private RoleRepository roleRepository;
-    private PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public UserService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
@@ -33,13 +34,27 @@ public class UserService {
         encodePassword(user);
         userRepository.save(user);
     }
+
+    public User findUserById(Integer id) throws UserNotFoundException{
+        Optional<User> optionalUser = userRepository.findById(id);
+        if (optionalUser.isPresent()) return userRepository.findById(id).get();
+        throw new UserNotFoundException("Could not find any user with ID " + id);
+    }
+
     private void encodePassword(User user){
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
     }
-    public boolean isEmailUnique(String email){
+    public boolean isEmailUnique(Integer id, String email){
         User userByEmail = userRepository.findUserByEmail(email);
-        return userByEmail == null;
+        if (userByEmail == null) return true;
+        boolean isCreateUser = (id == null);
+        if (isCreateUser){
+            if (userByEmail != null) return false;
+        }else {
+            if (userByEmail.getId() != id) return false;
+        }
+        return true;
     }
 
 
