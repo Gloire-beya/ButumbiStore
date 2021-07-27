@@ -1,6 +1,23 @@
 # ButumbiStore
 ButumbiStore is ecommerce platform allowing customers to buy online.
 
+## Some of the technologies used is this project are:
+* Java EE 
+* Java SE
+* Lombok
+* Spring boot
+* Spring Data Jpa
+* Hibernate
+* Spring Security
+* Thymeleaf
+* JavaScript
+* JQuery
+* AJAX
+* CSS
+* HTML
+* Bootstrap
+* MySQL
+
 ## Functional requirements
 
 
