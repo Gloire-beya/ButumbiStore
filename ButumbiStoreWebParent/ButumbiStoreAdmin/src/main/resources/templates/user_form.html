@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="content-type" content="text/html" ; charset="UTF-8">
+    <meta http-equiv="content-type" content="text/html" charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
 
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
@@ -65,13 +65,20 @@
     </div>
 
     <form th:action="@{/users/save}" th:object="${user}"
-          method="post" onsubmit="return checkEmailUnique(this);" style="max-width: 700px; margin: 0 auto">
+          method="post" onsubmit="return checkEmailUnique(this);"
+          enctype="multipart/form-data"
+          style="max-width: 700px; margin: 0 auto">
         <input type="hidden" th:field="*{id}"/>
         <div class="border border-secondary rounded p-3">
+
             <div class="form-group row">
                 <label class="col-sm-4 col-form-label">E-mail</label>
                 <div class="col-sm-8">
-                    <input type="email" th:field="*{email}" class="form-control" required minlength="8"
+                    <input type="email"
+                           th:field="*{email}"
+                           class="form-control"
+                           required
+                           minlength="8"
                            maxlength="120"/>
                 </div>
             </div>
@@ -79,7 +86,11 @@
             <div class="form-group row">
                 <label class="col-sm-4 col-form-label">First name</label>
                 <div class="col-sm-8">
-                    <input type="text" th:field="*{firstName}" class="form-control" required minlength="2"
+                    <input type="text"
+                           th:field="*{firstName}"
+                           class="form-control"
+                           required
+                           minlength="2"
                            maxlength="45"/>
                 </div>
             </div>
@@ -87,7 +98,11 @@
             <div class="form-group row">
                 <label class="col-sm-4 col-form-label">Last name</label>
                 <div class="col-sm-8">
-                    <input type="text" th:field="*{lastName}" class="form-control" required minlength="2"
+                    <input type="text"
+                           th:field="*{lastName}"
+                           class="form-control"
+                           required
+                           minlength="2"
                            maxlength="45"/>
                 </div>
             </div>
@@ -95,9 +110,18 @@
             <div class="form-group row">
                 <label class="col-sm-4 col-form-label">Password</label>
                 <div class="col-sm-8">
-                    <input type="password" th:if="${user.id == null}" th:field="*{password}" class="form-control" required minlength="8"
+                    <input type="password"
+                           th:if="${user.id == null}"
+                           th:field="*{password}"
+                           class="form-control"
+                           required
+                           minlength="8"
                            maxlength="20"/>
-                    <input type="password" th:if="${user.id != null}" th:field="*{password}" class="form-control" minlength="8"
+                    <input type="password"
+                           th:if="${user.id != null}"
+                           th:field="*{password}"
+                           class="form-control"
+                           minlength="8"
                            maxlength="20"/>
                 </div>
             </div>
@@ -106,8 +130,11 @@
                 <label class="col-sm-4 col-form-label">Roles:</label>
                 <div class="col-sm-8">
                     <th:block th:each="role : ${roleList}">
-                        <input type="checkbox" th:field="*{roleSet}" th:text="${role.name}"
-                               th:value="${role.id}" class="m-2"/> <br/>
+                        <input type="checkbox"
+                               th:field="*{roleSet}"
+                               th:text="${role.name}"
+                               th:value="${role.id}"
+                               class="m-2"/> <br/>
                     </th:block>
                 </div>
             </div>
@@ -115,8 +142,26 @@
             <div class="form-group row">
                 <label class="col-sm-4 col-form-label">Enabled</label>
                 <div class="col-sm-8">
-                    <input type="checkbox" th:field="*{enabled}"
-                           th:value="${user.id}" class="m-2"/>
+                    <input type="checkbox"
+                           th:field="*{enabled}"
+                           class="m-2"/>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-sm-4 col-form-label">Photos</label>
+                <div class="col-sm-8">
+                    <input type="hidden" th:field ="*{photos}"/>
+                    <input type="file"
+                           id="fileImage"
+                           name="image"
+                           class="m-2"
+                           accept="image/png, image/jpeg"/>
+                    <img   id="thumbnail"
+                           alt="Photos preview"
+                           class="img-fluid"
+                           th:src="@{${user.photosImagePath}}"/>
+
                 </div>
             </div>
 
@@ -156,7 +201,29 @@
         $("#buttonCancel").on("click", function () {
             window.location = "[[@{/users}]]";
         });
+
+        $("#fileImage").change(function () {
+           let fileSize = this.files[0].size;
+
+           if (fileSize > 1048576){
+               this.setCustomValidity("Your image must be less than 1MB");
+               this.reportValidity();
+           }else{
+               this.setCustomValidity("");
+               showImageThumbnail(this);
+           }
+        });
+
     });
+
+    function showImageThumbnail(fileInput){
+            let file = fileInput.files[0];
+            let reader = new FileReader();
+            reader.onload = function (e){
+                $("#thumbnail").attr("src", e.target.result);
+            }
+            reader.readAsDataURL(file);
+    }
 
     function checkEmailUnique(form) {
         let url = "[[@{/users/check_email}]]";

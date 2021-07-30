@@ -7,6 +7,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.annotation.Commit;
 
 import java.util.List;
@@ -14,7 +17,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest
+@DataJpaTest(showSql = false)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Commit
 @Slf4j
@@ -59,15 +62,16 @@ class UserRepositoryTest {
     }
 
     @Test
-    public void findUserById(){
+    public void findUserById() {
         Optional<User> optionalUser = userRepository.findById(2);
-        if (optionalUser.isPresent()){
+        if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             log.info("User No. " + user.getId() + " " + user.getFirstName() + " " + user.getRoleSet());
         }
     }
+
     @Test
-    public void updateUserById(){
+    public void updateUserById() {
         Optional<User> optionalUser = userRepository.findById(1);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
@@ -77,11 +81,12 @@ class UserRepositoryTest {
             assertThat(savedUser.getEmail()).isEqualTo("gloirebeyait@gmail.com");
         }
     }
+
     @Test
-    public void updateUserRole(){
+    public void updateUserRole() {
         Optional<User> optionalUser = userRepository.findById(2);
 
-        if(optionalUser.isPresent()){
+        if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             user.getRoleSet().remove(new Role(2));
             user.addRole(new Role(3), new Role(4));
@@ -93,15 +98,60 @@ class UserRepositoryTest {
     }
 
     @Test
-    public void testDeleteUserById(){
+    public void testDeleteUserById() {
         userRepository.deleteById(3);
     }
 
     @Test
-    public void testFindUserByEmail(){
+    public void testFindUserByEmail() {
         String email = "gloirebeyait@gmail.com";
         User userByEmail = userRepository.findUserByEmail(email);
 
         assertThat(userByEmail).isNotNull();
+    }
+
+    @Test
+    public void testCountUserById() {
+        Integer id = 2;
+        Long count = userRepository.countById(id);
+        assertThat(count).isEqualTo(1);
+    }
+
+    @Test
+    public void testUpdateDisableStatus() {
+        userRepository.updateEnableStatus(2, false);
+    }
+
+    @Test
+    public void testUpdateEnableStatus() {
+        userRepository.updateEnableStatus(9, true);
+    }
+
+    @Test
+    public void testListFirstPage() {
+
+        int pageNumber = 0;
+        int pageSize = 4;
+
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        Page<User> page = userRepository.findAll(pageable);
+        List<User> userList = page.getContent();
+
+        userList.forEach(user -> System.out.println(user));
+        assertThat(userList.size()).isEqualTo(pageSize);
+
+    }
+
+    @Test
+    public void findAllWithKeyword() {
+        String keyword = "Bruce";
+        int pageNumber = 0;
+        int pageSize = 4;
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        Page<User> allWithKeyword = userRepository.findAllWithKeyword(keyword, pageable);
+
+        List<User> userList = allWithKeyword.getContent();
+        System.out.println(userList);
+        assertThat(userList.size()).isGreaterThan(0);
     }
 }

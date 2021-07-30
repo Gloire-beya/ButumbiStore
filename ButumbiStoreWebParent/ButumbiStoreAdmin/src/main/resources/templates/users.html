@@ -18,7 +18,7 @@
     <div>
         <nav class="navbar navbar-expand-lg bg-warning">
             <a class="navbar-brand" th:href="@{/}">
-                <img th:src="@{images/logo_butumbi.png}" alt="Logo brand">
+                <img th:src="@{/images/logo_butumbi.png}" alt="Logo brand"/>
             </a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#topNavbar">
                 <span class="navbar-toggler-icon"></span>
@@ -67,47 +67,173 @@
         <a th:href="@{/users/new}">Create new User</a>
     </div>
 
+    <!------------------------------ Alert banner------------------------------->
+
     <div th:if="${message != null}" class="alert alert-success text-center">
         [[${message}]]
     </div>
+    <!--**************************** End Alert banner ***************************-->
+
+
+    <!---------------------------------- Filter form ---------------------------->
+
+    <div>
+        <form th:action="@{/users/page/1}" class="form-inline m-3">
+            <input type="hidden" name="sortField" th:value="${sortField}"/>
+            <input type="hidden" name="sortOrder" th:value="${sortOrder}"/>
+            Filter : &nbsp;
+            <input type="search" name="keyword"
+                   class="form-control" th:value="${keyword}"
+                   placeholder="Search here" required/>
+            &nbsp;&nbsp;
+            <input type="submit" value="Search" class="btn btn-primary"/>
+            <input type="button" value="Clear" class="btn btn-secondary m-2" onclick="clearFilter()"/>
+        </form>
+    </div>
+
+    <!--**************************** End of Filter form ************************-->
+
+
+    <!------------------------------- Users Table --------------------------------->
     <div>
         <table class="table table-bordered table-hover table-striped table-responsive-lg">
             <thead class="thead-dark">
-                <tr>
-                    <th>User ID</th>
-                    <th>Photos</th>
-                    <th>Email</th>
-                    <th>First name</th>
-                    <th>Last name</th>
-                    <th>Roles</th>
-                    <th>Enabled</th>
-                    <th></th>
-                </tr>
+            <tr>
+                <th th:replace="fragment :: column_link('id', 'User ID')" />
+                <th>Photos</th>
+                <th th:replace="fragment :: column_link('email', 'Email')" />
+                <th th:replace="fragment :: column_link('firstName', 'First Name')" />
+                <th th:replace="fragment :: column_link('lastName', 'Last Name')" />
+                <th>Roles</th>
+                <th th:replace="fragment :: column_link('enabled', 'Enabled')" />
+                <th></th>
+            </tr>
             </thead>
             <tbody>
-                <tr th:each="user : ${userList}">
-                    <td>[[${user.id}]]</td>
-                    <td class="text-center"><span class="fas fa-portrait fa-3x icon-sliver"></span></td>
-                    <td>[[${user.email}]]</td>
-                    <td>[[${user.firstName}]]</td>
-                    <td>[[${user.lastName}]]</td>
-                    <td>[[${user.roleSet}]]</td>
-                    <td>
-                        <a th:if="${user.isEnabled() == true}" class="fas fa-check-circle fa-2x icon-green" href=""></a>
-                        <a th:if="${user.isEnabled() == false}" class="fas fa-check-circle fa-2x icon-sliver" href=""></a>
-                    </td>
-                    <td>
-                        <a class="fas fa-edit fa-2x icon-green" th:href="@{'/users/edit/' + ${user.id}}" title="Edit this user"></a>
-                        &nbsp;
-                        <a class="fas fa-trash fa-2x icon-dark" href=""></a>
-                    </td>
-                </tr>
+            <tr th:each="user : ${userList}">
+                <td>[[${user.id}]]</td>
+                <td class="text-center">
+                        <span th:if="${user.photos == null}"
+                              class="fas fa-portrait fa-3x icon-sliver"></span>
+                    <img th:if="${user.photos != null}"
+                         style="width: 50px; height: 50px; border-radius: 50%"
+                         th:src="@{${user.photosImagePath}}"/>
+                </td>
+                <td>[[${user.email}]]</td>
+                <td>[[${user.firstName}]]</td>
+                <td>[[${user.lastName}]]</td>
+                <td>[[${user.roleSet}]]</td>
+                <td>
+                    <a th:if="${user.isEnabled() == true}"
+                       class="fas fa-check-circle fa-2x icon-green"
+                       title="Disable this user"
+                       th:href="@{'/users/' + ${user.id} + '/enabled/false'}"></a>
+                    <a th:if="${user.isEnabled() == false}"
+                       class="fas fa-circle fa-2x icon-sliver"
+                       title="Enable this user"
+                       th:href="@{'/users/' + ${user.id} + '/enabled/true'}"></a>
+                </td>
+                <td>
+                    <a class="fas fa-edit fa-2x icon-green" th:href="@{'/users/edit/' + ${user.id}}"
+                       title="Edit this user"></a>
+                    &nbsp;
+                    <a class="fas fa-trash fa-2x icon-dark link-delete"
+                       th:userId="${user.id}"
+                       th:href="@{'/users/delete/' + ${user.id}}"
+                       title="Delete this user"></a>
+                </td>
+            </tr>
             </tbody>
         </table>
     </div>
+
+    <!--**************************** End of Users Table ************************-->
+
+
+    <!------------------------------- Pagination info -------------------------- -->
+    <div class="m-2 text-center" th:if="${totalElement > 0}">
+        <span>Users # [[${startCount}]] to [[${andCount}]] of [[${totalElement}]]</span>
+    </div>
+    <div class="m-2 text-center" th:unless="${totalElement > 0}">
+        <span>No users found</span>
+    </div>
+    <!--*************************** End of pagination info ***********************-->
+
+
+    <!------------------------------- Pagination ----------------------------------->
+    <div th:if="${totalPages > 1}">
+        <nav>
+            <ul class="pagination justify-content-center">
+                <li th:class="${currentPage == 1 ? 'page-item disabled' : 'page-item'}">
+                    <a th:replace="fragment :: page_link(1, 'Fist')"></a>
+                </li>
+                <li th:class="${currentPage == 1 ? 'page-item disabled' : 'page-item'}">
+                    <a th:replace="fragment :: page_link(${currentPage - 1}, 'Previous')"></a>
+                </li>
+
+                <li th:class="${currentPage == i ? 'page-item active' : 'page-item'}"
+                    th:each="i : ${#numbers.sequence(1, totalPages)}">
+                    <a th:replace="fragment :: page_link(${i}, ${i})"></a>
+                </li>
+
+                <li th:class="${currentPage == totalPages ? 'page-item disabled' : 'page-item'}">
+                    <a th:replace="fragment :: page_link(${currentPage + 1}, 'Next')"></a>
+                </li>
+                <li th:class="${currentPage == totalPages ? 'page-item disabled' : 'page-item'}">
+                    <a th:replace="fragment :: page_link(${totalPages}, 'Last')"></a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <!--************************ End of Pagination ****************************-->
+
+
+    <!------------------------------- Delete confirmation modal -------------------->
+    <div class="modal fade text-center" id="confirmModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Delete confirmation</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <span id="confirm-text"></span>
+                </div>
+
+                <div class="modal-footer">
+                    <a class="btn btn-success" href="" id="yes-button">Yes</a>
+                    &nbsp;
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--************************ End of Delete confirmation modal******************-->
+
+
     <div class="text-center">
         <p>Butumbi Control Panel - Copyright &copy; Butumbi</p>
     </div>
 </div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".link-delete").on("click", function (e) {
+            e.preventDefault();
+            let link = $(this);
+            let userId = link.attr("userId");
+
+            $("#yes-button").attr("href", link.attr("href"));
+            $("#confirm-text").text("Are you sure you want to delete this User ID " + userId + " ?");
+            $("#confirmModal").modal();
+        });
+    });
+
+    function clearFilter() {
+        window.location = "[[@{/users}]]";
+    }
+
+</script>
 </body>
 </html>
