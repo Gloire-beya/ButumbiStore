@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="content-type" content="text/html" charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
+    <script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+
+    <title>[[${pageTitle}]]</title>
+</head>
+<body>
+<div class="container-fluid">
+    <div>
+        <nav class="navbar navbar-expand-lg bg-warning">
+            <a class="navbar-brand" th:href="@{/}">
+                <img th:src="@{/images/logo_butumbi.png}" alt="Logo brand"/>
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#topNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="topNavbar">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/users}">Users</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/categories}">Categories</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/brands}">UBrands</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/products}">Products</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/customers}">Cuatomers</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/orders}">Orders</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/shipping}">Shipping</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/report}">Sales report</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/articles}">Articles</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/menu}">Menu</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/settings}">Settings</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+    <div>
+        <h2>Manage users | [[${pageTitle}]]</h2>
+    </div>
+
+    <form th:action="@{/users/save}" th:object="${user}"
+          method="post" onsubmit="return checkEmailUnique(this);"
+          enctype="multipart/form-data"
+          style="max-width: 700px; margin: 0 auto">
+        <input type="hidden" th:field="*{id}"/>
+        <div class="border border-secondary rounded p-3">
+
+            <div class="form-group row">
+                <label class="col-sm-4 col-form-label">E-mail</label>
+                <div class="col-sm-8">
+                    <input type="email"
+                           th:field="*{email}"
+                           class="form-control"
+                           required
+                           minlength="8"
+                           maxlength="120"/>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-sm-4 col-form-label">First name</label>
+                <div class="col-sm-8">
+                    <input type="text"
+                           th:field="*{firstName}"
+                           class="form-control"
+                           required
+                           minlength="2"
+                           maxlength="45"/>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-sm-4 col-form-label">Last name</label>
+                <div class="col-sm-8">
+                    <input type="text"
+                           th:field="*{lastName}"
+                           class="form-control"
+                           required
+                           minlength="2"
+                           maxlength="45"/>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-sm-4 col-form-label">Password</label>
+                <div class="col-sm-8">
+                    <input type="password"
+                           th:if="${user.id == null}"
+                           th:field="*{password}"
+                           class="form-control"
+                           required
+                           minlength="8"
+                           maxlength="20"/>
+                    <input type="password"
+                           th:if="${user.id != null}"
+                           th:field="*{password}"
+                           class="form-control"
+                           minlength="8"
+                           maxlength="20"/>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-sm-4 col-form-label">Roles:</label>
+                <div class="col-sm-8">
+                    <th:block th:each="role : ${roleList}">
+                        <input type="checkbox"
+                               th:field="*{roleSet}"
+                               th:text="${role.name}"
+                               th:value="${role.id}"
+                               class="m-2"/> <br/>
+                    </th:block>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-sm-4 col-form-label">Enabled</label>
+                <div class="col-sm-8">
+                    <input type="checkbox"
+                           th:field="*{enabled}"
+                           class="m-2"/>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-sm-4 col-form-label">Photos</label>
+                <div class="col-sm-8">
+                    <input type="hidden" th:field ="*{photos}"/>
+                    <input type="file"
+                           id="fileImage"
+                           name="image"
+                           class="m-2"
+                           accept="image/png, image/jpeg"/>
+                    <img   id="thumbnail"
+                           alt="Photos preview"
+                           class="img-fluid"
+                           th:src="@{${user.photosImagePath}}"/>
+
+                </div>
+            </div>
+
+            <div class="text-center">
+                <input type="submit" value="Save user" class="btn btn-primary m-2"/>
+                <input type="button" value="Cancel" class="btn btn-secondary" id="buttonCancel"/>
+            </div>
+        </div>
+    </form>
+
+    <div class="modal fade text-center" id="modalDialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="modalTitle">Warning</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <span id="modalBody"></span>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center">
+        <p>Butumbi Control Panel - Copyright &copy; Butumbi</p>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#buttonCancel").on("click", function () {
+            window.location = "[[@{/users}]]";
+        });
+
+        $("#fileImage").change(function () {
+           let fileSize = this.files[0].size;
+
+           if (fileSize > 1048576){
+               this.setCustomValidity("Your image must be less than 1MB");
+               this.reportValidity();
+           }else{
+               this.setCustomValidity("");
+               showImageThumbnail(this);
+           }
+        });
+
+    });
+
+    function showImageThumbnail(fileInput){
+            let file = fileInput.files[0];
+            let reader = new FileReader();
+            reader.onload = function (e){
+                $("#thumbnail").attr("src", e.target.result);
+            }
+            reader.readAsDataURL(file);
+    }
+
+    function checkEmailUnique(form) {
+        let url = "[[@{/users/check_email}]]";
+        let userEmail = $("#email").val();
+        let userId = $("#id").val();
+        let csrfValue = $("input[name = '_csrf']").val();
+        let params = {id: userId ,email: userEmail, _csrf: csrfValue};
+
+        $.post(url, params, function (response) {
+            if (response === "OK") {
+                form.submit();
+            } else if (response === "Duplicated") {
+                showModalDialog("Warning", "There is another user having the email " + userEmail);
+            } else {
+                showModalDialog("Error", "Unknpwn response from the server");
+            }
+        }).fail(function () {
+            showModalDialog("Error", "Could not connect to the server");
+        });
+        return false;
+    }
+
+    function showModalDialog(title, message) {
+        $("#modalTitle").text(title);
+        $("#modalBody").text(message);
+        $("#modalDialog").modal();
+    }
+
+</script>
+</body>
+</html>
